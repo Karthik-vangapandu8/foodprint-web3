@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/head'); %>
+</head>
+
+<body>
+  <!-- START: header -->
+
+  <div class="probootstrap-loader"></div>
+
+  <header role="banner" class="probootstrap-header">
+    <%- include('partials/header'); %>
+  </header>
+  <!-- END: header -->
+
+
+  <div class="container" style="width: 100%;">
+    <div class="row align-items-center justify-content-center">
+      <!-- START WEB3 LOGIN FORM-->
+      <div class="col-md-6 col-md-offset-3">
+        <%- include('partials/notificationbar'); %>
+        <div class="login">
+          <div class="login-image probootstrap-section-heading text-center probootstrap-animate fadeInUp probootstrap-animated" style="background-image: url(/img/farm1.jpg); height: 200px; background-size: 100%; background-repeat: no-repeat; "></div>
+          
+          <h4 class="heading text-center">🌾 FoodPrint Login</h4>
+          <p class="text-center" style="color: #666; margin-bottom: 30px;">Connect your wallet to access the supply chain platform</p>
+          
+          <div class="login-form probootstrap-form mb60">
+            <!-- Role Selection -->
+            <div class="form-group">
+              <label for="userRole" style="font-weight: bold;">Select Your Role:</label>
+              <select id="userRole" class="form-control" style="color: black; font-size: 16px; padding: 12px;">
+                <option value="" disabled selected>Choose your role in the supply chain...</option>
+                <option value="farmer">🌾 Farmer - Grow and harvest produce</option>
+                <option value="wholesaler">📦 Wholesaler - Buy and distribute bulk produce</option>
+                <option value="distributor">🚚 Distributor - Transport and deliver products</option>
+                <option value="retailer">🏪 Retailer - Sell to end consumers</option>
+                <option value="admin">⚙️ Administrator - Manage the platform</option>
+              </select>
+              <small class="form-text text-muted">Your role determines what features you can access</small>
+            </div>
+
+            <!-- Wallet Connect Button -->
+            <div class="form-group" style="margin-top: 30px;">
+              <button id="web3LoginBtn" class="btn btn-primary btn-lg btn-block" style="padding: 15px; font-size: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <span style="font-size: 24px;">🦊</span> Login with MetaMask
+              </button>
+              <small class="form-text text-muted text-center" style="display: block; margin-top: 10px;">
+                Secure, passwordless authentication using your crypto wallet
+              </small>
+            </div>
+
+            <!-- Wallet Status Display -->
+            <div id="loginStatusMessage" style="margin-top: 20px; display: none;">
+              <div class="alert alert-info" role="alert">
+                <strong>Connecting...</strong> Please check MetaMask and sign the message.
+              </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="form-group" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+              <p class="text-center" style="color: #666;">
+                <strong>Don't have MetaMask?</strong><br>
+                <a href="https://metamask.io/download/" target="_blank" style="color: #667eea;">
+                  Get MetaMask →
+                </a>
+              </p>
+            </div>
+
+            <!-- Traditional Login Fallback (Optional) -->
+            <div class="form-group text-center" style="margin-top: 20px;">
+              <a href="#" id="showTraditionalLogin" style="color: #999; font-size: 14px; text-decoration: underline;">
+                Use traditional login instead
+              </a>
+            </div>
+          </div>
+
+          <!-- Traditional Login Form (Hidden by default) -->
+          <div id="traditionalLoginForm" style="display: none;">
+            <form class="login-form probootstrap-form mb60 validate-form" method="post">
+              <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" style="color: black;" id="loginUsername" name="loginUsername" class="form-control" placeholder="Enter Username" required />
+              </div>
+
+              <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" style="color: black;" id="loginPassword" name="loginPassword" class="form-control" placeholder="Enter Password" required>
+              </div>
+
+              <div class="form-group">
+                <button class="btn btn-primary" type="submit" formaction="/app/auth/login">Login</button>
+              </div>
+
+              <div class="form-group text-center">
+                <a href="#" id="showWeb3Login" style="color: #667eea;">
+                  ← Back to Web3 Login
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END WEB3 LOGIN FORM-->
+  </div>
+  <div><br /></div>
+  <!-- start footer -->
+  <%- include('partials/footer'); %>
+  <!-- end footer -->
+
+  <!--<script type="text/javascript" src="/js/bundle.js"></script>-->
+  <script src="/js/scripts.min.js"></script>
+  <script src="/js/main.min.js"></script>
+  <script src="/js/custom.js"></script>
+
+  <!-- Web3 Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+
+  <!-- Web3 Login Script -->
+  <script>
+    // Toggle between Web3 and Traditional Login
+    document.getElementById('showTraditionalLogin')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('.login-form').style.display = 'none';
+      document.getElementById('traditionalLoginForm').style.display = 'block';
+    });
+
+    document.getElementById('showWeb3Login')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('traditionalLoginForm').style.display = 'none';
+      document.querySelector('.login-form').style.display = 'block';
+    });
+
+    // Web3 Login Handler
+    document.getElementById('web3LoginBtn')?.addEventListener('click', async function() {
+      // Get selected role
+      const roleSelect = document.getElementById('userRole');
+      const selectedRole = roleSelect.value;
+
+      if (!selectedRole) {
+        alert('Please select your role first!');
+        roleSelect.focus();
+        return;
+      }
+
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        alert('MetaMask is not installed! Please install MetaMask to continue.');
+        window.open('https://metamask.io/download/', '_blank');
+        return;
+      }
+
+      // Show loading message
+      const statusMsg = document.getElementById('loginStatusMessage');
+      const loginBtn = document.getElementById('web3LoginBtn');
+      statusMsg.style.display = 'block';
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...';
+
+      try {
+        // Initialize Web3Modal
+        const web3Modal = new Web3Modal.default({
+          cacheProvider: false,
+          providerOptions: {},
+          disableInjectedProvider: false,
+        });
+
+        // Connect to wallet
+        const instance = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(instance);
+        const signer = provider.getSigner();
+        const walletAddress = await signer.getAddress();
+
+        console.log('Wallet connected:', walletAddress);
+
+        // Create message to sign
+        const message = `FoodPrint: Login as ${selectedRole} at ${new Date().toISOString()}`;
+
+        // Update status
+        statusMsg.innerHTML = '<div class="alert alert-info"><strong>Please sign the message in MetaMask...</strong></div>';
+
+        // Request signature
+        const signature = await signer.signMessage(message);
+
+        // Update status
+        statusMsg.innerHTML = '<div class="alert alert-info"><strong>Verifying signature...</strong></div>';
+
+        // Send to backend
+        const response = await fetch('/app/wallet/connect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            walletAddress: walletAddress,
+            signature: signature,
+            message: message,
+            userRole: selectedRole,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Success!
+          statusMsg.innerHTML = '<div class="alert alert-success"><strong>✅ Login successful!</strong> Redirecting...</div>';
+          
+          // Redirect to home page
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
+      } catch (error) {
+        console.error('Web3 login error:', error);
+        
+        let errorMessage = error.message;
+        if (error.code === 4001) {
+          errorMessage = 'You rejected the signature request. Please try again.';
+        }
+        
+        statusMsg.innerHTML = `<div class="alert alert-danger"><strong>❌ Login failed:</strong> ${errorMessage}</div>`;
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span style="font-size: 24px;">🦊</span> Login with MetaMask';
+      }
+    });
+  </script>
+</body>
+
+</html>
