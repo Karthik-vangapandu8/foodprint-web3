@@ -311,6 +311,47 @@
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
         }
+        .wallet-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255,107,107,0.3);
+        }
+        .wallet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255,107,107,0.5);
+        }
+        .wallet-connected {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        }
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .wallet-balance {
+            background: rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
         @media (max-width: 768px) {
             .products-container {
                 grid-template-columns: 1fr;
@@ -334,6 +375,14 @@
             <div class="search-bar">
                 <input type="text" class="search-input" placeholder="टमाटर, आलू, गेहूं... | Search crops" id="searchInput">
                 <button class="voice-search-btn" onclick="voiceSearch()">🎤</button>
+            </div>
+            
+            <!-- MetaMask Wallet Button -->
+            <div id="walletSection">
+                <button class="wallet-button" id="walletButton" onclick="handleWalletClick()">
+                    <span>🦊</span>
+                    <span id="walletButtonText">Connect Wallet</span>
+                </button>
             </div>
         </div>
     </div>
@@ -408,9 +457,9 @@
 
                 <!-- Blockchain Actions -->
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button onclick="showBlockchainInfo('0xabc123...')" style="flex: 1; padding: 10px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <button onclick="verifyProductWithWallet('0xabc123...')" style="flex: 1; padding: 10px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
                         <span>⛓️</span>
-                        <span>Track Journey</span>
+                        <span>Verify & Track</span>
                     </button>
                     <button onclick="scanQRCode()" style="padding: 10px 15px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 20px; cursor: pointer;">
                         📱
@@ -667,6 +716,13 @@
 
     <%- include('partials/scripts') %>
     
+    <!-- Web3 Libraries - MUST load before wallet-connect.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+
+    <!-- Web3 Wallet Integration -->
+    <script src="/js/wallet-connect.js"></script>
+    
     <script>
         // Filter functionality
         document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -821,6 +877,224 @@
             if (e.target === this) {
                 closeQRScanner();
             }
+        });
+
+        // ===== METAMASK WALLET INTEGRATION =====
+        
+        let connectedWallet = null;
+        let walletBalance = null;
+
+        // Initialize wallet on page load
+        async function initWallet() {
+            if (typeof window.FoodPrintWallet !== 'undefined') {
+                const status = await window.FoodPrintWallet.getWalletStatus();
+                if (status.connected) {
+                    connectedWallet = status.address;
+                    updateWalletUI(status.address);
+                    await updateBalance(status.address);
+                }
+            }
+        }
+
+        // Handle wallet button click
+        async function handleWalletClick() {
+            if (connectedWallet) {
+                // Already connected, show options
+                showWalletOptions();
+            } else {
+                // Connect wallet
+                await connectMetaMask();
+            }
+        }
+
+        // Connect to MetaMask
+        async function connectMetaMask() {
+            try {
+                if (!window.ethereum) {
+                    alert('🦊 MetaMask not found! Please install MetaMask extension.');
+                    window.open('https://metamask.io/download/', '_blank');
+                    return;
+                }
+
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                connectedWallet = accounts[0];
+                
+                // Update UI
+                updateWalletUI(connectedWallet);
+                await updateBalance(connectedWallet);
+
+                // Speak confirmation
+                if (window.speechSynthesis) {
+                    const utterance = new SpeechSynthesisUtterance('वॉलेट जुड़ा! Wallet connected!');
+                    window.speechSynthesis.speak(utterance);
+                }
+
+                // Listen for account changes
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        connectedWallet = null;
+                        updateWalletUI(null);
+                    } else {
+                        connectedWallet = accounts[0];
+                        updateWalletUI(connectedWallet);
+                        updateBalance(connectedWallet);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Failed to connect wallet: ' + error.message);
+            }
+        }
+
+        // Update wallet UI
+        function updateWalletUI(address) {
+            const button = document.getElementById('walletButton');
+            const buttonText = document.getElementById('walletButtonText');
+
+            if (address) {
+                button.classList.add('wallet-connected');
+                const shortAddress = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+                button.innerHTML = `
+                    <span>✅</span>
+                    <div style="text-align: left;">
+                        <div style="font-size: 12px; opacity: 0.9;">${shortAddress}</div>
+                        <div id="walletBalanceDisplay" style="font-size: 11px; opacity: 0.8;">Loading...</div>
+                    </div>
+                `;
+            } else {
+                button.classList.remove('wallet-connected');
+                buttonText.textContent = 'Connect Wallet';
+            }
+        }
+
+        // Get wallet balance
+        async function updateBalance(address) {
+            try {
+                const balance = await window.ethereum.request({
+                    method: 'eth_getBalance',
+                    params: [address, 'latest']
+                });
+                
+                // Convert from wei to ETH
+                const ethBalance = parseInt(balance, 16) / 1e18;
+                walletBalance = ethBalance.toFixed(4);
+                
+                const balanceDisplay = document.getElementById('walletBalanceDisplay');
+                if (balanceDisplay) {
+                    balanceDisplay.textContent = `${walletBalance} ETH`;
+                }
+            } catch (error) {
+                console.error('Error getting balance:', error);
+            }
+        }
+
+        // Show wallet options menu
+        function showWalletOptions() {
+            const options = confirm('Wallet Connected!\n\n' +
+                'Address: ' + connectedWallet + '\n' +
+                'Balance: ' + (walletBalance || '...') + ' ETH\n\n' +
+                'Click OK to disconnect wallet');
+            
+            if (options) {
+                disconnectWallet();
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet() {
+            connectedWallet = null;
+            walletBalance = null;
+            updateWalletUI(null);
+            
+            if (window.speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance('वॉलेट डिस्कनेक्ट। Wallet disconnected.');
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Enhanced Contact Farmer with Crypto Payment Option
+        async function contactFarmerEnhanced(phone, productName, price) {
+            if (!connectedWallet) {
+                alert('Please connect your wallet first to verify your identity!');
+                return;
+            }
+
+            const options = [
+                '1. 💬 Contact via WhatsApp',
+                '2. 📞 Call Farmer',
+                '3. 💳 Pay with Crypto (Coming Soon)',
+                '4. ⛓️ View Product on Blockchain'
+            ].join('\n');
+
+            alert(`Connected Wallet: ${connectedWallet.substring(0, 10)}...\n\nProduct: ${productName}\n\n${options}`);
+
+            // For now, open WhatsApp
+            contactFarmer(phone, productName);
+        }
+
+        // Sign transaction for purchase (placeholder)
+        async function signPurchase(productHash, amount) {
+            try {
+                if (!connectedWallet) {
+                    throw new Error('Wallet not connected');
+                }
+
+                // Create message to sign
+                const message = `FoodPrint Purchase\nProduct: ${productHash}\nAmount: ${amount} ETH\nBuyer: ${connectedWallet}`;
+
+                // Request signature
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, connectedWallet]
+                });
+
+                console.log('Purchase signed:', signature);
+                return signature;
+            } catch (error) {
+                console.error('Error signing purchase:', error);
+                alert('Failed to sign purchase: ' + error.message);
+                return null;
+            }
+        }
+
+        // Verify product on blockchain with wallet
+        async function verifyProductWithWallet(blockchainHash) {
+            if (!connectedWallet) {
+                alert('Please connect wallet to verify products!');
+                await connectMetaMask();
+                return;
+            }
+
+            // Show blockchain info
+            showBlockchainInfo(blockchainHash);
+
+            // Add wallet signature
+            const message = `Verified by: ${connectedWallet}\nProduct Hash: ${blockchainHash}\nDate: ${new Date().toISOString()}`;
+            
+            try {
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, connectedWallet]
+                });
+                
+                console.log('Verification signature:', signature);
+                
+                // Speak confirmation
+                if (window.speechSynthesis) {
+                    const utterance = new SpeechSynthesisUtterance('उत्पाद सत्यापित! Product verified on blockchain!');
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+            }
+        }
+
+        // Initialize wallet on page load
+        window.addEventListener('load', () => {
+            console.log('Marketplace loaded with MetaMask integration');
+            setTimeout(initWallet, 500);
         });
 
         // Load products from backend (TODO: Replace with actual API call)
