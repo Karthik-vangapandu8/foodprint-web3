@@ -84,27 +84,38 @@
       </button>
     </div>
 
+    <!-- BIG ACTION CARDS - Most Prominent -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+      <!-- VOICE MODE CARD -->
+      <a href="/app/harvest/voice" style="text-decoration: none; display: block; background: linear-gradient(135deg, #f44336 0%, #e91e63 100%); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(244,67,54,0.4); transition: all 0.3s; color: white;">
+        <div style="font-size: 80px; text-align: center; margin-bottom: 20px;">🎤</div>
+        <h2 style="font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; color: white;">बस बोलें</h2>
+        <h3 style="font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 15px; opacity: 0.95; color: white;">Just Speak</h3>
+        <p style="text-align: center; font-size: 18px; margin: 0; opacity: 0.9; color: white;">
+          No typing • No forms<br>
+          केवल बोलें • कोई फॉर्म नहीं
+        </p>
+      </a>
+
+      <!-- SIMPLE MODE CARD -->
+      <a href="/app/harvest/simple" style="text-decoration: none; display: block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(102,126,234,0.4); transition: all 0.3s; color: white;">
+        <div style="font-size: 80px; text-align: center; margin-bottom: 20px;">📱</div>
+        <h2 style="font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; color: white;">आइकन मोड</h2>
+        <h3 style="font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 15px; opacity: 0.95; color: white;">Icon Mode</h3>
+        <p style="text-align: center; font-size: 18px; margin: 0; opacity: 0.9; color: white;">
+          Click pictures • 4 steps<br>
+          चित्र पर क्लिक करें
+        </p>
+      </a>
+    </div>
+
     <div class="title col-12 title-global-container">
       <h3 class="title-global">
-        🌾 फसल लॉगबुक | Harvest Logbook
+        📋 सभी फसलें | All Harvests
       </h3>
     </div>
     <div class="buttons">
-      <!-- VOICE MODE - BIGGEST BUTTON -->
-      <a class="btn btn-lg" href="/app/harvest/voice" style="background: linear-gradient(135deg, #f44336 0%, #e91e63 100%); color: white; font-size: 22px; font-weight: 800; padding: 20px 40px; margin-bottom: 15px; border: none; box-shadow: 0 6px 20px rgba(244,67,54,0.5); display: flex; align-items: center; justify-content: center; gap: 15px;">
-        <span style="font-size: 32px;">🎤</span>
-        <div style="text-align: left;">
-          <div>बस बोलें | Just Speak</div>
-          <small style="font-size: 14px; opacity: 0.9;">No typing, no forms!</small>
-        </div>
-      </a>
-
-      <!-- SIMPLE MODE - Icon selection -->
-      <a class="btn btn-lg" href="/app/harvest/simple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px; font-weight: 700; padding: 12px 25px; margin-bottom: 10px; border: none; box-shadow: 0 4px 15px rgba(102,126,234,0.4);">
-        📱 Simple Mode (Icons) | आइकन मोड
-      </a>
-      
-      <a class="btn btn-secondary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">⚙️ Advanced Mode</a>
+      <a class="btn btn-secondary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')" style="background: #9e9e9e;">⚙️ Advanced Mode (Experts Only)</a>
       <a class="btn btn-secondary btn-sm" href="/app/harvest/pdf" target="_blank">📄 View PDF</a>
       <% if (user.role == "Admin" || user.role == "Superuser") { %>
       <a class="btn btn-primary btn-sm" href="/app/harvest/pdf/all" target="_blank">View All Harvest Records (PDF)</a>
