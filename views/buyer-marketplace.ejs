@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <title>🛒 Marketplace - FoodPrint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .marketplace-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .header-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .voice-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .voice-search-btn:hover {
+            background: #5568d3;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .filters-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .filter-chip {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-chip:hover, .filter-chip.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .products-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+        }
+        .quality-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .product-info {
+            padding: 20px;
+        }
+        .product-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .product-name-hindi {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .detail-icon {
+            font-size: 18px;
+        }
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        .price-unit {
+            font-size: 14px;
+            color: #666;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-whatsapp {
+            flex: 1;
+            padding: 12px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-whatsapp:hover {
+            background: #20ba5a;
+            transform: scale(1.05);
+        }
+        .btn-call {
+            padding: 12px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-call:hover {
+            background: #1976D2;
+            transform: scale(1.05);
+        }
+        .farmer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 15px;
+        }
+        .farmer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .farmer-details {
+            flex: 1;
+        }
+        .farmer-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 14px;
+        }
+        .farmer-location {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .floating-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .floating-chat:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+        @media (max-width: 768px) {
+            .products-container {
+                grid-template-columns: 1fr;
+            }
+            .header-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <!-- Marketplace Header -->
+    <div class="marketplace-header">
+        <div class="header-content">
+            <div>
+                <h1 class="header-title">🛒 खरीदें | Buy Fresh Produce</h1>
+                <p class="header-subtitle">किसान से सीधे खरीदें • Buy directly from farmers</p>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="टमाटर, आलू, गेहूं... | Search crops" id="searchInput">
+                <button class="voice-search-btn" onclick="voiceSearch()">🎤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+        <div class="filter-chip active" data-filter="all">
+            🌾 सभी | All
+        </div>
+        <div class="filter-chip" data-filter="vegetables">
+            🥕 सब्ज़ियाँ | Vegetables
+        </div>
+        <div class="filter-chip" data-filter="fruits">
+            🍎 फल | Fruits
+        </div>
+        <div class="filter-chip" data-filter="grains">
+            🌾 अनाज | Grains
+        </div>
+        <div class="filter-chip" data-filter="organic">
+            ✅ जैविक | Organic
+        </div>
+        <div class="filter-chip" data-filter="nearby">
+            📍 नज़दीक | Nearby
+        </div>
+        <div class="filter-chip" data-filter="fresh">
+            🆕 ताज़ा | Fresh Today
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-container" id="productsContainer">
+        <!-- Sample Product Card 1 -->
+        <div class="product-card" data-category="vegetables">
+            <div class="product-image">
+                🍅
+                <span class="quality-badge">✅ जैविक</span>
+            </div>
+            <div class="product-info">
+                <div class="product-name">
+                    Tomato
+                    <span style="font-size: 16px;">🔥 Fresh</span>
+                </div>
+                <div class="product-name-hindi">टमाटर</div>
+                
+                <div class="product-details">
+                    <div class="detail-row">
+                        <span class="detail-icon">📦</span>
+                        <span><strong>100 kg</strong> उपलब्ध</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">📍</span>
+                        <span>5 km away • Pune</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">✅</span>
+                        <span>Pesticide Free</span>
+                    </div>
+                </div>
+
+                <div class="price-row">
+                    <span class="price">₹40</span>
+                    <span class="price-unit">/ kg</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-whatsapp" onclick="contactFarmer('9876543210', 'Tomato')">
+                        <span>💬</span>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="btn-call" onclick="callFarmer('9876543210')">
+                        📞
+                    </button>
+                </div>
+
+                <div class="farmer-info">
+                    <div class="farmer-avatar">RS</div>
+                    <div class="farmer-details">
+                        <div class="farmer-name">Ramesh Sharma</div>
+                        <div class="farmer-location">
+                            <span>🌾</span>
+                            <span>Verified Farmer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Product Card 2 -->
+        <div class="product-card" data-category="vegetables">
+            <div class="product-image">
+                🥔
+            </div>
+            <div class="product-info">
+                <div class="product-name">Potato</div>
+                <div class="product-name-hindi">आलू</div>
+                
+                <div class="product-details">
+                    <div class="detail-row">
+                        <span class="detail-icon">📦</span>
+                        <span><strong>200 kg</strong> उपलब्ध</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">📍</span>
+                        <span>12 km away • Mumbai</span>
+                    </div>
+                </div>
+
+                <div class="price-row">
+                    <span class="price">₹30</span>
+                    <span class="price-unit">/ kg</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-whatsapp" onclick="contactFarmer('9876543211', 'Potato')">
+                        <span>💬</span>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="btn-call" onclick="callFarmer('9876543211')">
+                        📞
+                    </button>
+                </div>
+
+                <div class="farmer-info">
+                    <div class="farmer-avatar">SK</div>
+                    <div class="farmer-details">
+                        <div class="farmer-name">Suresh Kumar</div>
+                        <div class="farmer-location">
+                            <span>🌾</span>
+                            <span>Verified Farmer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Product Card 3 -->
+        <div class="product-card" data-category="grains">
+            <div class="product-image">
+                🌾
+                <span class="quality-badge">✅ जैविक</span>
+            </div>
+            <div class="product-info">
+                <div class="product-name">
+                    Wheat
+                    <span style="font-size: 14px; background: #ff9800; color: white; padding: 4px 8px; border-radius: 8px;">🔥 HOT</span>
+                </div>
+                <div class="product-name-hindi">गेहूं</div>
+                
+                <div class="product-details">
+                    <div class="detail-row">
+                        <span class="detail-icon">📦</span>
+                        <span><strong>5 quintal</strong> उपलब्ध</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">📍</span>
+                        <span>8 km away • Delhi</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">✅</span>
+                        <span>100% Organic</span>
+                    </div>
+                </div>
+
+                <div class="price-row">
+                    <span class="price">₹2,500</span>
+                    <span class="price-unit">/ quintal</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-whatsapp" onclick="contactFarmer('9876543212', 'Wheat')">
+                        <span>💬</span>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="btn-call" onclick="callFarmer('9876543212')">
+                        📞
+                    </button>
+                </div>
+
+                <div class="farmer-info">
+                    <div class="farmer-avatar">AP</div>
+                    <div class="farmer-details">
+                        <div class="farmer-name">Anil Patel</div>
+                        <div class="farmer-location">
+                            <span>⭐</span>
+                            <span>Top Seller</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <div class="floating-chat" onclick="openWhatsAppSupport()" title="हमसे बात करें | Chat with us">
+        💬
+    </div>
+
+    <%- include('partials/scripts') %>
+    
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                // Remove active from all
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                // Add active to clicked
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                filterProducts(filter);
+            });
+        });
+
+        function filterProducts(category) {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    if (card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('.product-name').textContent.toLowerCase();
+                const nameHindi = card.querySelector('.product-name-hindi').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || nameHindi.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Voice search
+        function voiceSearch() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Voice search not supported in this browser. Please use Chrome or Edge.');
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'hi-IN';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('searchInput').value = transcript;
+                
+                // Trigger search
+                const inputEvent = new Event('input', { bubbles: true });
+                document.getElementById('searchInput').dispatchEvent(inputEvent);
+            };
+
+            recognition.start();
+            
+            // Visual feedback
+            const btn = document.querySelector('.voice-search-btn');
+            btn.style.background = '#f44336';
+            setTimeout(() => {
+                btn.style.background = '#667eea';
+            }, 3000);
+        }
+
+        // Contact farmer via WhatsApp
+        function contactFarmer(phone, productName) {
+            const message = encodeURIComponent(`नमस्ते! मुझे ${productName} खरीदना है। | Hello! I want to buy ${productName}.`);
+            const url = `https://wa.me/91${phone}?text=${message}`;
+            window.open(url, '_blank');
+        }
+
+        // Call farmer
+        function callFarmer(phone) {
+            window.location.href = `tel:+91${phone}`;
+        }
+
+        // Open WhatsApp support
+        function openWhatsAppSupport() {
+            const message = encodeURIComponent('नमस्ते! मुझे FoodPrint Marketplace के बारे में जानकारी चाहिए। | Hello! I need help with FoodPrint Marketplace.');
+            window.open('https://wa.me/919876543210?text=' + message, '_blank');
+        }
+
+        // Load products from backend (TODO: Replace with actual API call)
+        // This is a placeholder - in production, fetch from /app/buyer/products API
+        console.log('Marketplace loaded');
+    </script>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
+

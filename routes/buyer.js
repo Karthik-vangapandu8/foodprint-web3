@@ -19,9 +19,34 @@ var sequelise = require('../config/db/db_sequelise');
 
 var models = initModels(sequelise);
 
-//GET Bid dashboard
+//GET Marketplace (NEW - Modern UI)
 router.get(
   '/',
+  require('connect-ensure-login').ensureLoggedIn({ redirectTo: '/app/auth/login' }),
+  function (req, res, next) {
+    if (
+      req.user.role === ROLES.Buyer ||
+      req.user.role === ROLES.Wholesaler ||
+      req.user.role === ROLES.Retailer ||
+      req.user.role === ROLES.Admin ||
+      req.user.role === ROLES.Superuser
+    ) {
+      // Render modern marketplace view
+      res.render('buyer-marketplace', {
+        page_title: 'FoodPrint - Marketplace',
+        user: req.user,
+        page_name: 'marketplace',
+      });
+    } else {
+      req.flash('error', 'You are not authorised to view this resource.');
+      res.redirect('/');
+    }
+  }
+);
+
+//GET Old Bid dashboard (for reference)
+router.get(
+  '/bids',
   require('connect-ensure-login').ensureLoggedIn({ redirectTo: '/app/auth/login' }),
   function (req, res, next) {
     if (
