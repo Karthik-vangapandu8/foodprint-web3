@@ -1,0 +1,581 @@
+/**
+ * Voice Input Styles - Farmer-Friendly UI
+ * Large buttons, clear visuals, bilingual labels
+ */
+
+/* Voice Input Button */
+.voice-input-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #4CAF50;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.voice-input-btn:hover {
+  background: #45a049;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.voice-input-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+.voice-hint {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  white-space: nowrap;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Listening State */
+.voice-input-btn.listening {
+  background: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+  }
+}
+
+.listening-animation {
+  width: 30px;
+  height: 30px;
+  border: 3px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Confirmation Dialog */
+.voice-confirmation {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.voice-confirmation p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.voice-confirmation .transcript {
+  font-weight: bold;
+  color: #4CAF50;
+  font-size: 16px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.voice-confirmation .btn-yes,
+.voice-confirmation .btn-no {
+  padding: 8px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.voice-confirmation .btn-yes {
+  background: #4CAF50;
+  color: white;
+}
+
+.voice-confirmation .btn-yes:hover {
+  background: #45a049;
+}
+
+.voice-confirmation .btn-no {
+  background: #f44336;
+  color: white;
+}
+
+.voice-confirmation .btn-no:hover {
+  background: #da190b;
+}
+
+/* Toast Notifications */
+.voice-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #333;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 90%;
+  text-align: center;
+}
+
+.voice-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.voice-toast-error {
+  background: #f44336;
+}
+
+.voice-toast-success {
+  background: #4CAF50;
+}
+
+.voice-toast-info {
+  background: #2196F3;
+}
+
+/* Language Selector */
+.language-selector {
+  position: relative;
+  display: inline-block;
+  margin-right: 15px;
+}
+
+.language-selector select {
+  padding: 8px 35px 8px 15px;
+  border: 2px solid #4CAF50;
+  border-radius: 25px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.3s;
+}
+
+.language-selector select:hover {
+  border-color: #45a049;
+  background: #f5f5f5;
+}
+
+.language-selector::after {
+  content: "🌍";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Simplified Form Styles */
+.simple-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-step {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-indicator {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.step-indicator .step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ddd;
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background: #4CAF50;
+  width: 30px;
+  border-radius: 6px;
+}
+
+.step-dot.completed {
+  background: #4CAF50;
+}
+
+/* Icon Selection Grid */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.icon-card {
+  background: white;
+  border: 3px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.icon-card:hover {
+  border-color: #4CAF50;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(76,175,80,0.3);
+}
+
+.icon-card.selected {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+}
+
+.icon-card .icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.icon-card .label-primary {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.icon-card .label-secondary {
+  font-size: 14px;
+  color: #666;
+}
+
+.icon-card .checkmark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: #4CAF50;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.icon-card.selected .checkmark {
+  display: flex;
+}
+
+/* Large Input Fields */
+.large-input {
+  width: 100%;
+  padding: 15px 60px 15px 15px;
+  font-size: 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.large-input:focus {
+  border-color: #4CAF50;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+}
+
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.form-label-bilingual {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label-primary {
+  font-size: 20px;
+  color: #333;
+}
+
+.form-label-secondary {
+  font-size: 16px;
+  color: #666;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-large {
+  flex: 1;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+}
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+.btn-voice {
+  background: #2196F3;
+  color: white;
+  width: 100%;
+  padding: 20px;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.btn-voice:hover {
+  background: #1976D2;
+}
+
+/* Number Pad */
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.number-btn {
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.number-btn:hover {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+}
+
+.number-btn:active {
+  transform: scale(0.95);
+}
+
+/* Voice Instruction */
+.voice-instruction {
+  background: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.voice-instruction-icon {
+  font-size: 32px;
+}
+
+.voice-instruction-text {
+  flex: 1;
+}
+
+.voice-instruction-primary {
+  font-weight: 700;
+  color: #1976D2;
+  margin-bottom: 5px;
+}
+
+.voice-instruction-secondary {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .icon-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .icon-card {
+    padding: 15px;
+  }
+
+  .icon-card .icon {
+    font-size: 36px;
+  }
+
+  .large-input {
+    font-size: 16px;
+  }
+
+  .btn-large {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+
+  .number-pad {
+    gap: 8px;
+  }
+
+  .number-btn {
+    padding: 15px;
+    font-size: 20px;
+  }
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .voice-input-btn {
+    border: 2px solid black;
+  }
+
+  .icon-card {
+    border-width: 4px;
+  }
+
+  .large-input {
+    border-width: 3px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

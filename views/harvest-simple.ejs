@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/src/css/voice-input.css">
+    <title>फसल जोड़ें | Add Harvest - FoodPrint</title>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+        <div class="simple-form-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="mb-2">
+                    <span style="font-size: 32px;">🌾</span>
+                    <span style="font-size: 24px; font-weight: 700;">फसल जोड़ें</span>
+                </h1>
+                <p style="font-size: 18px; color: #666;">Add Harvest</p>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <p>चरण <span id="currentStep">1</span> का 5</p>
+                <p style="font-size: 12px;">Step <span id="currentStepEn">1</span> of 5</p>
+                <div class="step-dots">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-dot" data-step="3"></div>
+                    <div class="step-dot" data-step="4"></div>
+                    <div class="step-dot" data-step="5"></div>
+                </div>
+            </div>
+
+            <form id="harvestForm">
+                <!-- Step 1: Crop Type -->
+                <div class="form-step active" data-step="1">
+                    <div class="voice-instruction">
+                        <span class="voice-instruction-icon">🎤</span>
+                        <div class="voice-instruction-text">
+                            <div class="voice-instruction-primary">आप फसल का नाम बोल सकते हैं</div>
+                            <div class="voice-instruction-secondary">You can speak the crop name</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-large btn-voice" onclick="listenForCrop()">
+                        🎤 बोलें | Speak
+                    </button>
+
+                    <p style="text-align: center; color: #999; margin: 20px 0;">या नीचे से चुनें (Or choose below)</p>
+
+                    <div class="icon-grid">
+                        <div class="icon-card" onclick="selectCrop('Tomato', '🍅', 'टमाटर', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🍅</div>
+                            <div class="label-primary">टमाटर</div>
+                            <div class="label-secondary">Tomato</div>
+                        </div>
+
+                        <div class="icon-card" onclick="selectCrop('Potato', '🥔', 'आलू', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🥔</div>
+                            <div class="label-primary">आलू</div>
+                            <div class="label-secondary">Potato</div>
+                        </div>
+
+                        <div class="icon-card" onclick="selectCrop('Wheat', '🌾', 'गेहूं', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🌾</div>
+                            <div class="label-primary">गेहूं</div>
+                            <div class="label-secondary">Wheat</div>
+                        </div>
+
+                        <div class="icon-card" onclick="selectCrop('Brinjal', '🍆', 'बैंगन', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🍆</div>
+                            <div class="label-primary">बैंगन</div>
+                            <div class="label-secondary">Brinjal</div>
+                        </div>
+
+                        <div class="icon-card" onclick="selectCrop('Carrot', '🥕', 'गाजर', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🥕</div>
+                            <div class="label-primary">गाजर</div>
+                            <div class="label-secondary">Carrot</div>
+                        </div>
+
+                        <div class="icon-card" onclick="selectCrop('Onion', '🧅', 'प्याज', this)">
+                            <div class="checkmark">✓</div>
+                            <div class="icon">🧅</div>
+                            <div class="label-primary">प्याज</div>
+                            <div class="label-secondary">Onion</div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="cropName" name="cropName">
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-large btn-primary" onclick="nextStep()" id="step1Next" disabled>
+                            आगे बढ़ें | Next →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Quantity -->
+                <div class="form-step" data-step="2">
+                    <div class="voice-instruction">
+                        <span class="voice-instruction-icon">🎤</span>
+                        <div class="voice-instruction-text">
+                            <div class="voice-instruction-primary">मात्रा बोलें</div>
+                            <div class="voice-instruction-secondary">Speak the quantity</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-large btn-voice" onclick="listenForQuantity()">
+                        🎤 मात्रा बोलें | Speak Quantity
+                    </button>
+
+                    <div class="form-group">
+                        <label class="form-label-bilingual">
+                            <span class="form-label-primary">कितनी मात्रा?</span>
+                            <span class="form-label-secondary">How much quantity?</span>
+                        </label>
+                        <input type="text" class="large-input" id="quantity" name="quantity" 
+                               placeholder="जैसे: 100 या बोलें">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-bilingual">
+                            <span class="form-label-primary">इकाई चुनें</span>
+                            <span class="form-label-secondary">Select Unit</span>
+                        </label>
+                        <div class="icon-grid">
+                            <div class="icon-card" onclick="selectUnit('kg', 'किलोग्राम', this)">
+                                <div class="checkmark">✓</div>
+                                <div class="icon">⚖️</div>
+                                <div class="label-primary">किलोग्राम</div>
+                                <div class="label-secondary">Kilogram (kg)</div>
+                            </div>
+                            <div class="icon-card" onclick="selectUnit('quintal', 'क्विंटल', this)">
+                                <div class="checkmark">✓</div>
+                                <div class="icon">📦</div>
+                                <div class="label-primary">क्विंटल</div>
+                                <div class="label-secondary">Quintal</div>
+                            </div>
+                            <div class="icon-card" onclick="selectUnit('ton', 'टन', this)">
+                                <div class="checkmark">✓</div>
+                                <div class="icon">🚛</div>
+                                <div class="label-primary">टन</div>
+                                <div class="label-secondary">Ton</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="unit" name="unit">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-large btn-secondary" onclick="prevStep()">
+                            ← पीछे | Back
+                        </button>
+                        <button type="button" class="btn-large btn-primary" onclick="nextStep()" id="step2Next" disabled>
+                            आगे बढ़ें | Next →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Photo -->
+                <div class="form-step" data-step="3">
+                    <div class="voice-instruction">
+                        <span class="voice-instruction-icon">📸</span>
+                        <div class="voice-instruction-text">
+                            <div class="voice-instruction-primary">फसल की फोटो लें</div>
+                            <div class="voice-instruction-secondary">Take a photo of the harvest</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <div id="photoPreview" style="margin: 20px 0; min-height: 200px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <p style="color: #999;">📸 फोटो यहाँ दिखेगी</p>
+                        </div>
+                        
+                        <label for="harvestPhoto" class="btn-large btn-primary" style="cursor: pointer;">
+                            📷 फोटो लें | Take Photo
+                        </label>
+                        <input type="file" id="harvestPhoto" name="harvestPhoto" accept="image/*" capture="environment" style="display: none;" onchange="previewPhoto(this)">
+                        
+                        <p style="margin-top: 15px; color: #666;">
+                            (वैकल्पिक - आप छोड़ भी सकते हैं)<br>
+                            <small>(Optional - you can skip)</small>
+                        </p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-large btn-secondary" onclick="prevStep()">
+                            ← पीछे | Back
+                        </button>
+                        <button type="button" class="btn-large btn-primary" onclick="nextStep()">
+                            आगे बढ़ें | Next →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Location -->
+                <div class="form-step" data-step="4">
+                    <div class="voice-instruction">
+                        <span class="voice-instruction-icon">📍</span>
+                        <div class="voice-instruction-text">
+                            <div class="voice-instruction-primary">आपकी स्थिति</div>
+                            <div class="voice-instruction-secondary">Your location</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-large btn-voice" onclick="getCurrentLocation()">
+                        📍 अपनी लोकेशन का उपयोग करें | Use My Location
+                    </button>
+
+                    <div class="form-group">
+                        <div id="locationPreview" style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center; margin: 20px 0;">
+                            <p style="font-size: 16px; font-weight: 600;">🌍 Location will appear here</p>
+                        </div>
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-large btn-secondary" onclick="prevStep()">
+                            ← पीछे | Back
+                        </button>
+                        <button type="button" class="btn-large btn-primary" onclick="nextStep()" id="step4Next" disabled>
+                            आगे बढ़ें | Next →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Confirm -->
+                <div class="form-step" data-step="5">
+                    <h3 style="text-align: center; margin-bottom: 30px;">
+                        <span style="font-size: 28px;">✅</span><br>
+                        पुष्टि करें | Confirm
+                    </h3>
+
+                    <div id="summaryContent" style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                        <!-- Summary will be populated by JS -->
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-large btn-secondary" onclick="prevStep()">
+                            ← पीछे | Back
+                        </button>
+                        <button type="submit" class="btn-large btn-primary">
+                            ✅ सहेजें | Save Harvest
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%- include('partials/scripts') %>
+    <script src="/src/js/voice-input.js"></script>
+    
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        const formData = {};
+
+        // Voice recognition for crop
+        function listenForCrop() {
+            const cropMap = {
+                'टमाटर': 'Tomato',
+                'tomato': 'Tomato',
+                'आलू': 'Potato',
+                'potato': 'Potato',
+                'गेहूं': 'Wheat',
+                'wheat': 'Wheat',
+                'बैंगन': 'Brinjal',
+                'brinjal': 'Brinjal',
+                'गाजर': 'Carrot',
+                'carrot': 'Carrot',
+                'प्याज': 'Onion',
+                'onion': 'Onion'
+            };
+
+            if (window.VoiceInputManager && window.VoiceInputManager.isSupported) {
+                const recognition = window.VoiceInputManager.recognition;
+                recognition.lang = 'hi-IN';
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    
+                    // Find matching crop
+                    for (let [key, value] of Object.entries(cropMap)) {
+                        if (transcript.includes(key.toLowerCase())) {
+                            selectCropByName(value);
+                            window.VoiceInputManager.speakText(`आपने चुना: ${key}`);
+                            break;
+                        }
+                    }
+                };
+                
+                recognition.start();
+            } else {
+                alert('वॉइस इनपुट उपलब्ध नहीं है। कृपया नीचे से चुनें।');
+            }
+        }
+
+        function selectCrop(cropName, icon, hindiName, element) {
+            // Remove previous selections
+            document.querySelectorAll('.icon-card').forEach(card => card.classList.remove('selected'));
+            
+            // Select this card
+            element.classList.add('selected');
+            
+            // Store data
+            document.getElementById('cropName').value = cropName;
+            formData.cropName = cropName;
+            formData.cropIcon = icon;
+            formData.cropHindi = hindiName;
+            
+            // Enable next button
+            document.getElementById('step1Next').disabled = false;
+            
+            // Speak confirmation
+            if (window.VoiceInputManager) {
+                window.VoiceInputManager.speakText(`आपने ${hindiName} चुना`);
+            }
+        }
+
+        function selectCropByName(cropName) {
+            const cardMap = {
+                'Tomato': 0,
+                'Potato': 1,
+                'Wheat': 2,
+                'Brinjal': 3,
+                'Carrot': 4,
+                'Onion': 5
+            };
+            
+            const cards = document.querySelectorAll('.icon-card');
+            const index = cardMap[cropName];
+            if (index !== undefined && cards[index]) {
+                cards[index].click();
+            }
+        }
+
+        function listenForQuantity() {
+            if (window.VoiceInputManager && window.VoiceInputManager.isSupported) {
+                const recognition = window.VoiceInputManager.recognition;
+                recognition.lang = 'hi-IN';
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    // Extract number from speech
+                    const numbers = transcript.match(/\d+/);
+                    if (numbers) {
+                        document.getElementById('quantity').value = numbers[0];
+                        formData.quantity = numbers[0];
+                        checkStep2Complete();
+                        window.VoiceInputManager.speakText(`मात्रा: ${numbers[0]}`);
+                    }
+                };
+                
+                recognition.start();
+            }
+        }
+
+        function selectUnit(unit, hindiUnit, element) {
+            document.querySelectorAll('[data-step="2"] .icon-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            document.getElementById('unit').value = unit;
+            formData.unit = unit;
+            formData.unitHindi = hindiUnit;
+            
+            checkStep2Complete();
+            
+            if (window.VoiceInputManager) {
+                window.VoiceInputManager.speakText(`इकाई: ${hindiUnit}`);
+            }
+        }
+
+        function checkStep2Complete() {
+            const quantity = document.getElementById('quantity').value;
+            const unit = document.getElementById('unit').value;
+            document.getElementById('step2Next').disabled = !(quantity && unit);
+        }
+
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').innerHTML = 
+                        `<img src="${e.target.result}" style="max-width: 100%; max-height: 300px; border-radius: 8px;">`;
+                    formData.hasPhoto = true;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('locationPreview').innerHTML = 
+                    `<p style="color: #4CAF50;">⏳ लोकेशन प्राप्त कर रहे हैं...</p>`;
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lon = position.coords.longitude.toFixed(6);
+                        
+                        document.getElementById('latitude').value = lat;
+                        document.getElementById('longitude').value = lon;
+                        formData.latitude = lat;
+                        formData.longitude = lon;
+                        
+                        document.getElementById('locationPreview').innerHTML = 
+                            `<p style="color: #4CAF50; font-weight: 600;">✅ लोकेशन मिल गई!</p>
+                             <p>📍 ${lat}, ${lon}</p>`;
+                        
+                        document.getElementById('step4Next').disabled = false;
+                        
+                        if (window.VoiceInputManager) {
+                            window.VoiceInputManager.speakText('लोकेशन मिल गई');
+                        }
+                    },
+                    (error) => {
+                        document.getElementById('locationPreview').innerHTML = 
+                            `<p style="color: #f44336;">❌ लोकेशन नहीं मिली</p>`;
+                        console.error('Location error:', error);
+                    }
+                );
+            } else {
+                alert('लोकेशन सपोर्ट नहीं है');
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 5) return;
+            
+            // Update step dots
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.add('completed');
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Hide current step
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Show next step
+            currentStep++;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Update indicators
+            document.getElementById('currentStep').textContent = currentStep;
+            document.getElementById('currentStepEn').textContent = currentStep;
+            
+            // Show summary on last step
+            if (currentStep === 5) {
+                showSummary();
+            }
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep() {
+            if (currentStep === 1) return;
+            
+            // Update step dots
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Hide current step
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Show previous step
+            currentStep--;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.remove('completed');
+            document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Update indicators
+            document.getElementById('currentStep').textContent = currentStep;
+            document.getElementById('currentStepEn').textContent = currentStep;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSummary() {
+            const summary = `
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border-radius: 8px;">
+                        <span style="font-size: 40px;">${formData.cropIcon}</span>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700;">${formData.cropHindi}</div>
+                            <div style="color: #666;">${formData.cropName}</div>
+                        </div>
+                    </div>
+                    <div style="padding: 15px; background: white; border-radius: 8px;">
+                        <div style="font-weight: 700;">⚖️ मात्रा | Quantity:</div>
+                        <div style="font-size: 18px; margin-top: 5px;">${formData.quantity} ${formData.unitHindi || formData.unit}</div>
+                    </div>
+                    ${formData.hasPhoto ? `
+                    <div style="padding: 15px; background: white; border-radius: 8px;">
+                        <div style="font-weight: 700;">📸 फोटो | Photo:</div>
+                        <div style="margin-top: 5px;">✅ Uploaded</div>
+                    </div>
+                    ` : ''}
+                    ${formData.latitude ? `
+                    <div style="padding: 15px; background: white; border-radius: 8px;">
+                        <div style="font-weight: 700;">📍 स्थान | Location:</div>
+                        <div style="font-size: 14px; margin-top: 5px;">${formData.latitude}, ${formData.longitude}</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('summaryContent').innerHTML = summary;
+            
+            // Speak summary
+            if (window.VoiceInputManager) {
+                window.VoiceInputManager.speakText(
+                    `${formData.cropHindi}, ${formData.quantity} ${formData.unitHindi}. कृपया पुष्टि करें।`
+                );
+            }
+        }
+
+        // Form submission
+        document.getElementById('harvestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading
+            alert('फसल सहेज रहे हैं... | Saving harvest...');
+            
+            // TODO: Submit to backend
+            console.log('Form data:', formData);
+            
+            // Success message
+            setTimeout(() => {
+                if (window.VoiceInputManager) {
+                    window.VoiceInputManager.speakText('फसल सफलतापूर्वक सहेजी गई');
+                }
+                alert('✅ फसल सफलतापूर्वक सहेजी गई! | Harvest saved successfully!');
+                window.location.href = '/app/harvest';
+            }, 1000);
+        });
+
+        // Enable voice on page load
+        if (window.VoiceInputManager && window.VoiceInputManager.isSupported) {
+            console.log('🎤 Voice input available!');
+            
+            // Give audio instructions
+            setTimeout(() => {
+                window.VoiceInputManager.speakText('नमस्ते। अपनी फसल का नाम बोलें।');
+            }, 1000);
+        }
+
+        // Listen for quantity input
+        document.getElementById('quantity').addEventListener('input', checkStep2Complete);
+    </script>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
+
