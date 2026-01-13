@@ -61,6 +61,28 @@ function getHarvestSqlSearchCondition(user){
     return sql_search_condition;
 }
 
+/* GET simple harvest page (farmer-friendly) */
+router.get(
+  '/simple',
+  require('connect-ensure-login').ensureLoggedIn({ redirectTo: '/app/auth/login' }),
+  function (req, res, next) {
+    if (
+      req.user.role === ROLES.Farmer ||
+      req.user.role === ROLES.Admin ||
+      req.user.role === ROLES.Superuser
+    ) {
+      res.render('harvest-simple', {
+        page_title: 'FoodPrint - Add Harvest (Simple Mode)',
+        user: req.user,
+        page_name: 'harvest-simple',
+      });
+    } else {
+      req.flash('error', 'You are not authorised to view this resource.');
+      res.redirect('/');
+    }
+  }
+);
+
 /* GET harvest page. */
 router.get(
   '/',

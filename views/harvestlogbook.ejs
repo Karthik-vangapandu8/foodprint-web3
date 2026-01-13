@@ -4,7 +4,7 @@
 <head>
   <%- include('partials/head'); %>
   <!-- Voice Input Styles -->
-  <link rel="stylesheet" href="/src/css/voice-input.css">
+  <link rel="stylesheet" href="/css/voice-input.css">
   <style>
     /* Quick styling for voice buttons in forms */
     .form-group {
@@ -90,7 +90,12 @@
       </h3>
     </div>
     <div class="buttons">
-      <a class="btn btn-primary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">Add New Harvest Entry</a>
+      <!-- SIMPLE MODE BUTTON - Big and prominent -->
+      <a class="btn btn-lg" href="/app/harvest/simple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 18px; font-weight: 700; padding: 15px 30px; margin-bottom: 10px; border: none; box-shadow: 0 4px 15px rgba(102,126,234,0.4);">
+        🎤 Simple Mode (Voice) | सरल मोड
+      </a>
+      
+      <a class="btn btn-primary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">Add New Harvest Entry (Advanced)</a>
       <a class="btn btn-primary btn-sm" href="/app/harvest/pdf" target="_blank">View My Harvest Record (PDF)</a>
       <% if (user.role == "Admin" || user.role == "Superuser") { %>
       <a class="btn btn-primary btn-sm" href="/app/harvest/pdf/all" target="_blank">View All Harvest Records (PDF)</a>
@@ -974,7 +979,7 @@
   <script src="/js/wallet-connect.js"></script>
 
   <!-- Voice Input Module -->
-  <script src="/src/js/voice-input.js"></script>
+  <script src="/js/voice-input.js"></script>
   
   <script>
     // Initialize Voice Input for harvest form
