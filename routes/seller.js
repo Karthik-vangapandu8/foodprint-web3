@@ -69,6 +69,56 @@ router.get(
   }
 );
 
+//GET seller marketplace (modern UI)
+router.get(
+  '/marketplace',
+  require('connect-ensure-login').ensureLoggedIn({ redirectTo: '/app/auth/login' }),
+  function (req, res, next) {
+    if (
+      req.user.role === ROLES.Seller ||
+      req.user.role === ROLES.Wholesaler ||
+      req.user.role === ROLES.Retailer ||
+      req.user.role === ROLES.Admin ||
+      req.user.role === ROLES.Superuser
+    ) {
+      models.Seller_offer.findAll({
+        where: {
+          offer_user: req.user.email,
+        },
+        order: [['pk', 'DESC']],
+      })
+        .then(rows => {
+          res.render('seller-marketplace', {
+            page_title: 'FoodPrint - My Inventory',
+            data: rows,
+            user: req.user,
+            filter_data: '',
+            page_name: 'seller-marketplace',
+          });
+        })
+        .catch(err => {
+          console.log('All seller marketplace err:' + err);
+          req.flash('error', err);
+          res.render('seller-marketplace', {
+            page_title: 'FoodPrint - My Inventory',
+            data: [],
+            filter_data: '',
+            user: req.user,
+            page_name: 'seller-marketplace',
+          });
+        });
+    } else {
+      res.render('error', {
+        message: 'You are not authorised to view this resource.',
+        title: 'Error',
+        user: req.user,
+        filter_data: '',
+        page_name: 'error',
+      });
+    }
+  }
+);
+
 //GET Filtered seller dashboard
 router.get(
   '/filter/produce/:range',
@@ -90,12 +140,16 @@ router.get(
         order: [['pk', 'DESC']],
       })
         .then(rows => {
-          res.render('sellerlogbook', {
+          // Determine which view to render based on referer or default to marketplace
+          const referer = req.get('referer') || '';
+          const isMarketplace = referer.includes('/marketplace');
+          
+          res.render(isMarketplace ? 'seller-marketplace' : 'sellerlogbook', {
             page_title: 'FoodPrint - Seller Logbook Page',
             data: rows,
             user: req.user,
             filter_data: req.params.range,
-            page_name: 'sellerlogbook',
+            page_name: isMarketplace ? 'seller-marketplace' : 'sellerlogbook',
           });
         })
         .catch(err => {

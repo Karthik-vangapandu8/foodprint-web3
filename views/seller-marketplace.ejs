@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head'); %>
+  <style>
+    /* Modern Seller Marketplace Styles */
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .marketplace-container {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .marketplace-header {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .marketplace-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+
+    .wallet-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .wallet-button {
+      background: linear-gradient(135deg, #f6851b 0%, #e2761b 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(246, 133, 27, 0.3);
+    }
+
+    .wallet-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(246, 133, 27, 0.4);
+    }
+
+    .wallet-button.connected {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .wallet-info {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0369a1;
+      display: none;
+    }
+
+    .wallet-info.show {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+      margin: 5px 0;
+    }
+
+    .stat-label {
+      color: #6b7280;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .action-bar {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .add-offer-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .add-offer-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .filter-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .filter-select {
+      padding: 10px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 20px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .offer-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .offer-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .offer-image {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      font-size: 6rem;
+      position: relative;
+    }
+
+    .blockchain-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(16, 185, 129, 0.95);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    }
+
+    .offer-content {
+      padding: 20px;
+    }
+
+    .offer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .offer-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-placed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-sold {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .offer-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .detail-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .price-tag {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .price-label {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .price-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .offer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-edit {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .btn-delete {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-blockchain {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: white;
+      grid-column: 1 / -1;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .empty-state {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .empty-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      color: #6b7280;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 20px 20px 0 0;
+      padding: 25px;
+    }
+
+    .modal-title {
+      font-weight: 700;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .form-control, .custom-select {
+      border-radius: 15px;
+      border: 2px solid #e5e7eb;
+      padding: 12px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .custom-select:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 30px;
+      padding: 12px 30px;
+      font-weight: 600;
+    }
+
+    .btn-secondary {
+      border-radius: 30px;
+      padding: 12px 30px;
+      font-weight: 600;
+    }
+
+    .timestamp {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .marketplace-title {
+        font-size: 1.8rem;
+      }
+
+      .offers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .marketplace-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .wallet-section {
+        justify-content: center;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="probootstrap-loader"></div>
+
+  <header role="banner" class="probootstrap-header">
+    <%- include('partials/header'); %>
+  </header>
+
+  <div class="marketplace-container">
+    <!-- Header with Wallet -->
+    <div class="marketplace-header">
+      <div>
+        <h1 class="marketplace-title">🏪 My Inventory</h1>
+        <p style="color: #6b7280; margin: 5px 0 0 0;">Manage your offers and track sales</p>
+      </div>
+      <div class="wallet-section">
+        <button id="walletButton" class="wallet-button">
+          <span>🦊</span>
+          <span id="walletButtonText">Connect MetaMask</span>
+        </button>
+        <div id="walletInfo" class="wallet-info">
+          <span id="walletAddress"></span>
+          <span id="walletBalance"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value"><%= data.length %></div>
+        <div class="stat-label">Total Offers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value"><%= data.filter(offer => offer.offer_status === 'Placed').length %></div>
+        <div class="stat-label">Active Offers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">
+          <%= data.reduce((sum, offer) => {
+            const price = parseFloat(offer.offer_price.replace('R', '') || 0);
+            return sum + price;
+          }, 0).toFixed(0) %>
+        </div>
+        <div class="stat-label">Total Value (₹)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-value"><%= data.filter(offer => offer.offer_status === 'Sold').length %></div>
+        <div class="stat-label">Sold Items</div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <button class="add-offer-btn" data-toggle="modal" data-target="#myModalAdd">
+        ➕ Add New Offer
+      </button>
+      <div class="filter-section">
+        <span style="font-weight: 600; color: #6b7280;">Filter:</span>
+        <select class="filter-select" id="produce_filter" onchange="activateProduceFilter()">
+          <option value="">All Products</option>
+          <option>Baby Marrow</option>
+          <option>Baby Leeks</option>
+          <option>Basil</option>
+          <option>Beetroot</option>
+          <option>Bergamot</option>
+          <option>Blood Oranges</option>
+          <option>Cabbage</option>
+          <option>Carrots</option>
+          <option>Cauliflower</option>
+          <option>Cayenne Pepper</option>
+          <option>Cucumber</option>
+          <option>Eggs</option>
+          <option>Fennel</option>
+          <option>Granadilla</option>
+          <option>Green Beans</option>
+          <option>Herbs</option>
+          <option>Lebanese Cucumber</option>
+          <option>Leeks</option>
+          <option>Lemon</option>
+          <option>Lettuce</option>
+          <option>Limes</option>
+          <option>Mor</option>
+          <option>Onion</option>
+          <option>Pak Choi</option>
+          <option>Parsley</option>
+          <option>Radish</option>
+          <option>Sorrel</option>
+          <option>Swiss Chard</option>
+          <option>Spinach</option>
+          <option>Turnips</option>
+        </select>
+      </div>
+    </div>
+
+    <%- include('partials/notificationbar'); %>
+
+    <!-- Offers Grid -->
+    <% if(data.length > 0) { %>
+      <div class="offers-grid">
+        <% data.forEach(function(offer) { 
+          // Map produce names to emojis
+          const produceEmojis = {
+            'Baby Marrow': '🥒',
+            'Baby Leeks': '🌱',
+            'Basil': '🌿',
+            'Beetroot': '🥕',
+            'Bergamot': '🍋',
+            'Blood Oranges': '🍊',
+            'Cabbage': '🥬',
+            'Carrots': '🥕',
+            'Cauliflower': '🥦',
+            'Cayenne Pepper': '🌶️',
+            'Cucumber': '🥒',
+            'Eggs': '🥚',
+            'Fennel': '🌿',
+            'Granadilla': '🥭',
+            'Green Beans': '🫘',
+            'Herbs': '🌿',
+            'Lebanese Cucumber': '🥒',
+            'Leeks': '🌱',
+            'Lemon': '🍋',
+            'Lettuce': '🥬',
+            'Limes': '🍋',
+            'Mor': '🍇',
+            'Onion': '🧅',
+            'Pak Choi': '🥬',
+            'Parsley': '🌿',
+            'Radish': '🥕',
+            'Sorrel': '🌿',
+            'Swiss Chard': '🥬',
+            'Spinach': '🥬',
+            'Turnips': '🥔'
+          };
+          const emoji = produceEmojis[offer.offer_produceName] || '🌾';
+        %>
+          <div class="offer-card">
+            <div class="offer-image">
+              <%= emoji %>
+              <div class="blockchain-badge">
+                ⛓️ Verified
+              </div>
+            </div>
+            <div class="offer-content">
+              <div class="offer-header">
+                <h3 class="offer-name"><%= offer.offer_produceName %></h3>
+                <span class="status-badge status-<%= offer.offer_status.toLowerCase() %>">
+                  <%= offer.offer_status %>
+                </span>
+              </div>
+
+              <div class="offer-details">
+                <div class="detail-item">
+                  <span class="detail-label">📦 Quantity</span>
+                  <span class="detail-value"><%= offer.offer_quantity %> <%= offer.offer_unitOfMeasure %></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">📍 Location</span>
+                  <span class="detail-value"><%= offer.offer_province %></span>
+                </div>
+              </div>
+
+              <div class="price-tag">
+                <div class="price-label">Price per <%= offer.offer_unitOfMeasure %></div>
+                <div class="price-value">₹<%= offer.offer_price.replace('R', '') %></div>
+              </div>
+
+              <div class="timestamp">
+                🕐 Listed <%= new Date(offer.offer_timeStamp).toLocaleDateString('en-IN', { 
+                  day: 'numeric', 
+                  month: 'short', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                }) %>
+              </div>
+
+              <div class="offer-actions">
+                <button class="action-btn btn-edit" onclick="viewOffer('<%= offer.offer_logid %>', '<%= offer.offer_produceName %>', '<%= offer.offer_quantity %>', '<%= offer.offer_unitOfMeasure %>', '<%= offer.offer_price %>', '<%= offer.offer_province %>', '<%= offer.offer_user %>', '<%= offer.offer_timeStamp %>', '<%= offer.offer_status %>', '<%= offer.offer_description || "" %>')">
+                  👁️ View Details
+                </button>
+                <button class="action-btn btn-delete" onclick="markAsSold('<%= offer.offer_logid %>')">
+                  ✅ Mark Sold
+                </button>
+                <button class="action-btn btn-blockchain" onclick="addToBlockchain('<%= offer.offer_logid %>')">
+                  ⛓️ Sign with Wallet
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h2 class="empty-title">No offers yet!</h2>
+        <p class="empty-text">Start by adding your first product offer to the marketplace.</p>
+        <button class="add-offer-btn" data-toggle="modal" data-target="#myModalAdd">
+          ➕ Create First Offer
+        </button>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Modal Add Offer -->
+  <form id="sellerOfferModalForm" action="/app/seller/offer/save" method="post">
+    <div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="exampleModalLabel">➕ Create New Offer</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="offer_produceName" style="font-weight: 600;">🌾 Produce Name</label>
+                  <select class="form-control" id="offer_produceName" name="offer_produceName" required>
+                    <option value="" selected disabled>Choose Produce...</option>
+                    <option>Baby Marrow</option>
+                    <option>Baby Leeks</option>
+                    <option>Basil</option>
+                    <option>Beetroot</option>
+                    <option>Bergamot</option>
+                    <option>Blood Oranges</option>
+                    <option>Cabbage</option>
+                    <option>Carrots</option>
+                    <option>Cauliflower</option>
+                    <option>Cayenne Pepper</option>
+                    <option>Cucumber</option>
+                    <option>Eggs</option>
+                    <option>Fennel</option>
+                    <option>Granadilla</option>
+                    <option>Green Beans</option>
+                    <option>Herbs</option>
+                    <option>Lebanese Cucumber</option>
+                    <option>Leeks</option>
+                    <option>Lemon</option>
+                    <option>Lettuce</option>
+                    <option>Limes</option>
+                    <option>Mor</option>
+                    <option>Onion</option>
+                    <option>Pak Choi</option>
+                    <option>Parsley</option>
+                    <option>Radish</option>
+                    <option>Sorrel</option>
+                    <option>Swiss Chard</option>
+                    <option>Spinach</option>
+                    <option>Turnips</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="offer_quantity" style="font-weight: 600;">📦 Quantity</label>
+                  <input type="number" name="offer_quantity" class="form-control" placeholder="Enter quantity" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="offer_unitOfMeasure" style="font-weight: 600;">⚖️ Unit of Measure</label>
+                  <select class="form-control" id="offer_unitOfMeasure" name="offer_unitOfMeasure" required>
+                    <option value="" selected disabled>Choose Unit...</option>
+                    <option>kilogram</option>
+                    <option>gram</option>
+                    <option>ton</option>
+                    <option>piece</option>
+                    <option>dozen</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="offer_price" style="font-weight: 600;">💰 Price (₹)</label>
+                  <input type="number" name="offer_price" class="form-control" placeholder="Enter price per unit" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="offer_province" style="font-weight: 600;">📍 Province</label>
+                  <select class="custom-select d-block w-100 form-control" name="offer_province" id="offer_province" required>
+                    <option value="" selected disabled>Choose a Province</option>
+                    <option>Western Cape</option>
+                    <option>Eastern Cape</option>
+                    <option>Northern Cape</option>
+                    <option>North West</option>
+                    <option>KZN</option>
+                    <option>Free State</option>
+                    <option>Gauteng</option>
+                    <option>Mpumalanga</option>
+                    <option>Limpopo</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="offer_description" style="font-weight: 600;">📝 Description (Optional)</label>
+                  <textarea id="offer_description" class="form-control" name="offer_description" rows="3" placeholder="Add details about quality, organic certification, etc."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">✅ Create Offer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Modal View Offer -->
+  <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="viewModalLabel">👁️ Offer Details</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label style="font-weight: 600;">🔑 Offer ID</label>
+                <input type="text" id="view_offer_logid" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">🌾 Produce Name</label>
+                <input type="text" id="view_offer_produceName" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">📦 Quantity</label>
+                <input type="text" id="view_offer_quantity" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">⚖️ Unit</label>
+                <input type="text" id="view_offer_unitOfMeasure" class="form-control" disabled>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label style="font-weight: 600;">💰 Price</label>
+                <input type="text" id="view_offer_price" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">📍 Province</label>
+                <input type="text" id="view_offer_province" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">👤 Listed By</label>
+                <input type="text" id="view_offer_user" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">🕐 Timestamp</label>
+                <input type="text" id="view_offer_timeStamp" class="form-control" disabled>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label style="font-weight: 600;">📝 Description</label>
+                <textarea id="view_offer_description" class="form-control" rows="3" disabled></textarea>
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 600;">📊 Status</label>
+                <input type="text" id="view_offer_status" class="form-control" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer'); %>
+  <%- include('partials/scripts'); %>
+
+  <script>
+    // Filter functionality
+    function activateProduceFilter() {
+      var filter = document.getElementById('produce_filter').value;
+      if (filter == "" || filter == "All Products") {
+        window.location = '/app/seller/marketplace';
+      } else if (filter) {
+        window.location = '/app/seller/filter/produce/' + filter;
+      }
+    }
+
+    // View offer details
+    function viewOffer(logid, produceName, quantity, unitOfMeasure, price, province, user, timestamp, status, description) {
+      document.getElementById('view_offer_logid').value = logid;
+      document.getElementById('view_offer_produceName').value = produceName;
+      document.getElementById('view_offer_quantity').value = quantity;
+      document.getElementById('view_offer_unitOfMeasure').value = unitOfMeasure;
+      document.getElementById('view_offer_price').value = price;
+      document.getElementById('view_offer_province').value = province;
+      document.getElementById('view_offer_user').value = user;
+      document.getElementById('view_offer_timeStamp').value = new Date(timestamp).toLocaleString('en-IN');
+      document.getElementById('view_offer_status').value = status;
+      document.getElementById('view_offer_description').value = description || 'No description provided';
+      $('#viewModal').modal('show');
+    }
+
+    // Mark as sold (placeholder)
+    function markAsSold(logid) {
+      if (confirm('Mark this offer as SOLD?')) {
+        alert('Feature coming soon! This will mark offer ' + logid + ' as sold.');
+        // TODO: Implement backend route to update offer status
+      }
+    }
+
+    // Add to blockchain using MetaMask
+    async function addToBlockchain(logid) {
+      try {
+        // Check if wallet is connected
+        if (!window.FoodPrintWallet || !window.FoodPrintWallet.account) {
+          alert('⚠️ Please connect your MetaMask wallet first!');
+          return;
+        }
+
+        const message = `Sign to verify offer ${logid} on blockchain`;
+        
+        // Sign using wallet
+        const signature = await window.FoodPrintWallet.signData(message);
+        
+        if (signature) {
+          // TODO: Send to backend to store on blockchain
+          alert('✅ Offer signed successfully!\n\nSignature: ' + signature.substring(0, 20) + '...');
+          console.log('Blockchain signature:', signature);
+        }
+      } catch (error) {
+        console.error('Blockchain error:', error);
+        alert('❌ Failed to sign offer: ' + error.message);
+      }
+    }
+
+    // MetaMask wallet integration
+    document.addEventListener('DOMContentLoaded', async function() {
+      const walletButton = document.getElementById('walletButton');
+      const walletButtonText = document.getElementById('walletButtonText');
+      const walletInfo = document.getElementById('walletInfo');
+      const walletAddress = document.getElementById('walletAddress');
+      const walletBalance = document.getElementById('walletBalance');
+
+      // Check if already connected
+      <% if (user && user.wallet_address) { %>
+        // User is logged in with wallet
+        if (window.FoodPrintWallet) {
+          try {
+            await window.FoodPrintWallet.init();
+            if (window.FoodPrintWallet.account) {
+              walletButtonText.textContent = 'Connected';
+              walletButton.classList.add('connected');
+              walletAddress.textContent = window.FoodPrintWallet.account.substring(0, 6) + '...' + window.FoodPrintWallet.account.substring(38);
+              
+              // Get balance
+              const balance = await window.FoodPrintWallet.getBalance();
+              walletBalance.textContent = ' | ' + parseFloat(balance).toFixed(4) + ' ETH';
+              walletInfo.classList.add('show');
+            }
+          } catch (error) {
+            console.error('Wallet init error:', error);
+          }
+        }
+      <% } %>
+
+      // Connect wallet button
+      walletButton.addEventListener('click', async function() {
+        if (walletButton.classList.contains('connected')) {
+          // Disconnect
+          if (confirm('Disconnect your wallet?')) {
+            try {
+              await window.FoodPrintWallet.disconnect();
+              window.location.reload();
+            } catch (error) {
+              console.error('Disconnect error:', error);
+            }
+          }
+        } else {
+          // Connect
+          try {
+            if (!window.FoodPrintWallet) {
+              alert('⚠️ Please install MetaMask browser extension first!');
+              window.open('https://metamask.io/download/', '_blank');
+              return;
+            }
+
+            const connected = await window.FoodPrintWallet.connect();
+            if (connected) {
+              walletButtonText.textContent = 'Connected';
+              walletButton.classList.add('connected');
+              walletAddress.textContent = window.FoodPrintWallet.account.substring(0, 6) + '...' + window.FoodPrintWallet.account.substring(38);
+              
+              const balance = await window.FoodPrintWallet.getBalance();
+              walletBalance.textContent = ' | ' + parseFloat(balance).toFixed(4) + ' ETH';
+              walletInfo.classList.add('show');
+
+              // Link wallet to account if not already linked
+              <% if (!user.wallet_address) { %>
+                try {
+                  await window.FoodPrintWallet.linkWalletToAccount('<%= user.role.toLowerCase() %>');
+                  window.location.reload();
+                } catch (error) {
+                  console.error('Link wallet error:', error);
+                }
+              <% } %>
+            }
+          } catch (error) {
+            console.error('Connect error:', error);
+            alert('❌ Failed to connect wallet: ' + error.message);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
