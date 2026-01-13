@@ -3,6 +3,59 @@
 
 <head>
   <%- include('partials/head'); %>
+  <!-- Voice Input Styles -->
+  <link rel="stylesheet" href="/src/css/voice-input.css">
+  <style>
+    /* Quick styling for voice buttons in forms */
+    .form-group {
+      position: relative;
+    }
+    .voice-btn-inline {
+      position: absolute;
+      right: 10px;
+      top: 32px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s;
+    }
+    .voice-btn-inline:hover {
+      background: #45a049;
+      transform: scale(1.1);
+    }
+    .voice-btn-inline svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+    .harvest-title-enhanced {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .language-toggle {
+      padding: 8px 15px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .language-toggle:hover {
+      background: #1976D2;
+    }
+  </style>
 </head>
 
 <body>
@@ -17,8 +70,24 @@
 
   <!-- START TABLE-->
   <div class="container harvestlogbook" style="width: 100%;">
+    <!-- Voice Assistant Banner -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+      <span style="font-size: 32px;">🎤</span>
+      <div style="flex: 1;">
+        <h4 style="color: white; margin: 0; font-size: 18px;">वॉइस असिस्टेंट सक्रिय है! | Voice Assistant Enabled!</h4>
+        <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 14px;">
+          आप बोलकर फॉर्म भर सकते हैं | You can fill forms by speaking
+        </p>
+      </div>
+      <button class="language-toggle" onclick="toggleLanguage()" id="langToggle">
+        🌍 हिन्दी | Hindi
+      </button>
+    </div>
+
     <div class="title col-12 title-global-container">
-      <h3 class="title-global">Harvest Logbook</h3>
+      <h3 class="title-global">
+        🌾 फसल लॉगबुक | Harvest Logbook
+      </h3>
     </div>
     <div class="buttons">
       <a class="btn btn-primary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">Add New Harvest Entry</a>
@@ -903,6 +972,189 @@
 
   <!-- Web3 Wallet Integration -->
   <script src="/js/wallet-connect.js"></script>
+
+  <!-- Voice Input Module -->
+  <script src="/src/js/voice-input.js"></script>
+  
+  <script>
+    // Initialize Voice Input for harvest form
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎤 Initializing Voice Input...');
+      
+      if (window.VoiceInputManager && window.VoiceInputManager.isSupported) {
+        // Add voice buttons to text inputs and textareas
+        addVoiceToInputs();
+        
+        // Welcome message
+        setTimeout(() => {
+          if (currentLanguage === 'hi') {
+            window.VoiceInputManager.speakText('नमस्ते। वॉइस असिस्टेंट तैयार है।');
+          } else {
+            window.VoiceInputManager.speakText('Hello. Voice assistant is ready.');
+          }
+        }, 1500);
+      } else {
+        console.warn('Voice input not supported in this browser');
+      }
+    });
+
+    // Current language
+    let currentLanguage = localStorage.getItem('farmLanguage') || 'en';
+
+    // Toggle language
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
+      localStorage.setItem('farmLanguage', currentLanguage);
+      
+      const langCode = currentLanguage === 'hi' ? 'hi-IN' : 'en-US';
+      if (window.VoiceInputManager) {
+        window.VoiceInputManager.setLanguage(langCode);
+      }
+      
+      // Update button text
+      const btn = document.getElementById('langToggle');
+      if (currentLanguage === 'hi') {
+        btn.innerHTML = '🌍 हिन्दी | Hindi';
+        if (window.VoiceInputManager) {
+          window.VoiceInputManager.speakText('भाषा बदल दी गई। अब आप हिन्दी में बोल सकते हैं।');
+        }
+      } else {
+        btn.innerHTML = '🌍 English';
+        if (window.VoiceInputManager) {
+          window.VoiceInputManager.speakText('Language changed to English.');
+        }
+      }
+    }
+
+    // Add voice buttons to all text inputs
+    function addVoiceToInputs() {
+      const inputs = document.querySelectorAll('#harvestViewModal input[type="text"], #harvestViewModal textarea');
+      
+      inputs.forEach(input => {
+        if (input.id && input.id.includes('modal')) {
+          // Create voice button
+          const voiceBtn = document.createElement('button');
+          voiceBtn.type = 'button';
+          voiceBtn.className = 'voice-btn-inline';
+          voiceBtn.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          `;
+          voiceBtn.title = currentLanguage === 'hi' ? 'बोलने के लिए क्लिक करें' : 'Click to speak';
+          
+          voiceBtn.onclick = function() {
+            startVoiceForField(input.id, voiceBtn);
+          };
+          
+          // Add to form group
+          const formGroup = input.closest('.form-group');
+          if (formGroup) {
+            formGroup.style.position = 'relative';
+            formGroup.appendChild(voiceBtn);
+          }
+        }
+      });
+
+      console.log(`✅ Added voice buttons to ${inputs.length} fields`);
+    }
+
+    // Start voice recognition for a field
+    function startVoiceForField(fieldId, button) {
+      if (!window.VoiceInputManager) return;
+      
+      const input = document.getElementById(fieldId);
+      if (!input) return;
+
+      const langCode = currentLanguage === 'hi' ? 'hi-IN' : 'en-US';
+      const recognition = window.VoiceInputManager.recognition;
+      
+      recognition.lang = langCode;
+      
+      // Visual feedback
+      button.style.background = '#f44336';
+      button.innerHTML = '<div class="listening-animation"></div>';
+      
+      // Handle result
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        input.value = transcript;
+        
+        // Trigger change event
+        const changeEvent = new Event('change', { bubbles: true });
+        input.dispatchEvent(changeEvent);
+        
+        // Reset button
+        button.style.background = '#4CAF50';
+        button.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        `;
+        
+        // Confirm
+        window.VoiceInputManager.speakText(
+          currentLanguage === 'hi' ? `आपने कहा: ${transcript}` : `You said: ${transcript}`
+        );
+      };
+
+      recognition.onerror = function(event) {
+        console.error('Voice error:', event.error);
+        button.style.background = '#4CAF50';
+        button.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        `;
+      };
+
+      recognition.onend = function() {
+        button.style.background = '#4CAF50';
+      };
+      
+      // Start
+      try {
+        recognition.start();
+        if (currentLanguage === 'hi') {
+          window.VoiceInputManager.speakText('बोलें');
+        }
+      } catch (error) {
+        console.error('Failed to start recognition:', error);
+      }
+    }
+
+    // Re-add voice buttons when modal opens
+    $('#harvestViewModal').on('shown.bs.modal', function () {
+      setTimeout(() => {
+        addVoiceToInputs();
+        
+        // Announce
+        if (window.VoiceInputManager) {
+          const msg = currentLanguage === 'hi' ? 
+            'फॉर्म खोला गया। आप बोल सकते हैं।' : 
+            'Form opened. You can speak.';
+          window.VoiceInputManager.speakText(msg);
+        }
+      }, 300);
+    });
+  </script>
+
+  <style>
+    .listening-animation {
+      width: 20px;
+      height: 20px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 
 </body>
 
