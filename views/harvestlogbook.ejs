@@ -90,13 +90,22 @@
       </h3>
     </div>
     <div class="buttons">
-      <!-- SIMPLE MODE BUTTON - Big and prominent -->
-      <a class="btn btn-lg" href="/app/harvest/simple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 18px; font-weight: 700; padding: 15px 30px; margin-bottom: 10px; border: none; box-shadow: 0 4px 15px rgba(102,126,234,0.4);">
-        🎤 Simple Mode (Voice) | सरल मोड
+      <!-- VOICE MODE - BIGGEST BUTTON -->
+      <a class="btn btn-lg" href="/app/harvest/voice" style="background: linear-gradient(135deg, #f44336 0%, #e91e63 100%); color: white; font-size: 22px; font-weight: 800; padding: 20px 40px; margin-bottom: 15px; border: none; box-shadow: 0 6px 20px rgba(244,67,54,0.5); display: flex; align-items: center; justify-content: center; gap: 15px;">
+        <span style="font-size: 32px;">🎤</span>
+        <div style="text-align: left;">
+          <div>बस बोलें | Just Speak</div>
+          <small style="font-size: 14px; opacity: 0.9;">No typing, no forms!</small>
+        </div>
+      </a>
+
+      <!-- SIMPLE MODE - Icon selection -->
+      <a class="btn btn-lg" href="/app/harvest/simple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px; font-weight: 700; padding: 12px 25px; margin-bottom: 10px; border: none; box-shadow: 0 4px 15px rgba(102,126,234,0.4);">
+        📱 Simple Mode (Icons) | आइकन मोड
       </a>
       
-      <a class="btn btn-primary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">Add New Harvest Entry (Advanced)</a>
-      <a class="btn btn-primary btn-sm" href="/app/harvest/pdf" target="_blank">View My Harvest Record (PDF)</a>
+      <a class="btn btn-secondary btn-sm" onclick="ShowModal(this, 'add', 'Add Harvest Entry','addCSS')">⚙️ Advanced Mode</a>
+      <a class="btn btn-secondary btn-sm" href="/app/harvest/pdf" target="_blank">📄 View PDF</a>
       <% if (user.role == "Admin" || user.role == "Superuser") { %>
       <a class="btn btn-primary btn-sm" href="/app/harvest/pdf/all" target="_blank">View All Harvest Records (PDF)</a>
       <% } %>
